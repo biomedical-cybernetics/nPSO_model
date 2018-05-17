@@ -1,4 +1,4 @@
-# Nonuniform PSO model
+# Nonuniform PSO (nPSO) model
 
 ## Reference
 
