@@ -14,7 +14,7 @@ https://doi.org/10.1088/1367-2630/aac06f
   Generation of Gaussian and Gamma mixture distribution with C components, as described in the Supplementary Information of the reference.
 
 * *example_usage.m*  
-  Example usage of the previous functions, the script generates and plots three examples:
+  Example usage of the previous functions, the script generates and plots four examples:
   - nPSO model with 4 communities and default Gaussian mixture distribution
   - nPSO model with 4 communities and custom Gaussian mixture distribution
   - nPSO model with 8 communities and custom mixture distribution (Gaussian and Gamma mixture distribution)
