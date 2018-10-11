@@ -15,8 +15,9 @@ https://doi.org/10.1088/1367-2630/aac06f
 
 * *example_usage.m*  
   Example usage of the previous functions, the script generates and plots three examples:
-  - nPSO model with 4 communities and default settings (Gaussian mixture distribution)
-  - nPSO model with 8 communities and custom settings (Gaussian and Gamma mixture distribution)
+  - nPSO model with 4 communities and default Gaussian mixture distribution
+  - nPSO model with 4 communities and custom Gaussian mixture distribution
+  - nPSO model with 8 communities and custom mixture distribution (Gaussian and Gamma mixture distribution)
   - PSO model
 
 ## Contact

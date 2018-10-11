@@ -33,12 +33,14 @@ function [x, coords, comm] = nPSO_model(N, m, T, gamma, distr, plot_flag)
 %         they have the same standard deviation equal to 1/6 of the distance
 %         between two adjacent means, and the mixing proportions
 %         are equal for the components
-%         (nPSO model with default settings)
+%         (nPSO model with default Gaussian mixture distribution)
+%       > a 'gmdistribution' object
+%         (nPSO model with custom Gaussian mixture distribution)
 %       > a cell having three elements:
 %         - vector with evenly spaced points between 0 and 2pi
 %         - vector representing the related probability density function
 %         - vector with the points representing the center of the communities
-%         (nPSO model with custom settings)
+%         (nPSO model with custom mixture distribution)
 % plot_flag - 1 or 0 to indicate whether the network and the mixture distribution
 %             have to be plotted or not (optional, default is 0)
 %
@@ -59,15 +61,15 @@ validateattributes(N, {'numeric'}, {'scalar','integer','>=',1,'finite'});
 validateattributes(m, {'numeric'}, {'scalar','integer','>=',1,'<',N});
 validateattributes(T, {'numeric'}, {'scalar','nonnegative','finite'});
 validateattributes(gamma, {'numeric'}, {'scalar','>=',2,'finite'});
-if isscalar(distr)
+if isnumeric(distr)
     validateattributes(distr, {'numeric'}, {'scalar','integer','nonnegative','finite'});
 elseif iscell(distr)
     validateattributes(distr, {'cell'}, {'vector','numel',3});
     validateattributes(distr{1}, {'numeric'}, {'vector','>=',0,'<=',2*pi});
     validateattributes(distr{2}, {'numeric'}, {'vector','nonnegative','finite','numel',length(distr{1})});
     validateattributes(distr{3}, {'numeric'}, {'vector','>=',0,'<=',2*pi});
-else
-    error('Input argument "distr" must be either a scalar or a cell');
+elseif ~isa(distr,'gmdistribution')
+    error('Input argument "distr" must be either a numeric scalar, a cell or a gmdistribution');
 end
 if nargin==5
     plot_flag = 0;
@@ -83,12 +85,12 @@ i = 0;
 
 % randomly sample the angular coordinates
 % and set the community memberships
-if isscalar(distr) && distr == 0
+if isnumeric(distr) && distr == 0
     % uniform distribution
     uniform = 1;
     coords(:,1) = rand(N,1)*2*pi;
     comm = [];
-elseif isscalar(distr) && distr > 0
+elseif isnumeric(distr) && distr > 0
     % Gaussian mixture distribution with default settings
     uniform = 0;
     C = distr;
@@ -98,7 +100,15 @@ elseif isscalar(distr) && distr > 0
     gmd = gmdistribution(mu', sigma, p);
     coords(:,1) = mod(random(gmd,N),2*pi);
     [~,comm] = min(pi - abs(pi-abs(repmat(coords(:,1),1,C)-repmat(mu,N,1))),[],2);
-else
+elseif isa(distr,'gmdistribution')
+    % Gaussian mixture distribution with custom settings
+    uniform = 0;
+    gmd = distr;
+    C = gmd.NumComponents;
+    mu = gmd.mu';
+    coords(:,1) = mod(random(gmd,N),2*pi);
+    [~,comm] = min(pi - abs(pi-abs(repmat(coords(:,1),1,C)-repmat(mu,N,1))),[],2);        
+elseif iscell(distr)
     % custom mixture distribution
     uniform = 0;
     angles = distr{1};
@@ -160,7 +170,7 @@ if plot_flag
     % plot mixture distribution
     if ~uniform
         figure('color','white')
-        if isscalar(distr)
+        if ~iscell(distr)
             [angles, angles_prob] = compute_points_gmd(gmd);
         end
         plot(angles, angles_prob, 'b', 'LineWidth', 2);
