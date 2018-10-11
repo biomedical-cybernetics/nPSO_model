@@ -22,7 +22,7 @@ function [x, coords, comm] = nPSO_model(N, m, T, gamma, distr, plot_flag)
 % m - half of average node degree (approximately),
 %     the number of edges is E = m*(m+1)/2 + (N-m-1)*m
 % T - temperature (inversely related to clustering) [T>=0]
-% gamma - exponent of the power-law node degree distribution [gamma>2]
+% gamma - exponent of the power-law node degree distribution [gamma>=2]
 % distr - input defining the distribution of the angular coordinates,
 %       it can be:
 %       > the value 0 to set a uniform angular distribution
@@ -58,7 +58,7 @@ narginchk(5,6)
 validateattributes(N, {'numeric'}, {'scalar','integer','>=',1,'finite'});
 validateattributes(m, {'numeric'}, {'scalar','integer','>=',1,'<',N});
 validateattributes(T, {'numeric'}, {'scalar','nonnegative','finite'});
-validateattributes(gamma, {'numeric'}, {'scalar','>',2,'finite'});
+validateattributes(gamma, {'numeric'}, {'scalar','>=',2,'finite'});
 if isscalar(distr)
     validateattributes(distr, {'numeric'}, {'scalar','integer','nonnegative','finite'});
 elseif iscell(distr)
@@ -137,7 +137,11 @@ for t = 2:N
             i = i + m;
         else
             % probability that the new node connects to the existing nodes
-            Rt = 2*log(t) - 2*log((2*T*(1 - exp(-(1 - beta)*log(t))))/(sin(T*pi)*m*(1 - beta)));
+            if beta == 1
+                Rt = 2*log(t) - 2*log((2*T*log(t))/(sin(T*pi)*m));
+            else
+                Rt = 2*log(t) - 2*log((2*T*(1 - exp(-(1 - beta)*log(t))))/(sin(T*pi)*m*(1 - beta)));
+            end
             p = 1 ./ (1 + exp((d - Rt)./(2*T)));
             
             % nonuniform sampling of m targets according to the probabilities
