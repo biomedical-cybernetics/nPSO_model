@@ -168,7 +168,9 @@ end
 x = sparse([x(:,1);x(:,2)],[x(:,2);x(:,1)],1,N,N);
 
 % matrix of pairwise hyperbolic distances between the nodes
-d = squareform(pdist(coords, @hyperbolic_dist));
+if nargout == 4
+    d = squareform(pdist(coords, @hyperbolic_dist));
+end
 
 if plot_flag
     % plot mixture distribution
