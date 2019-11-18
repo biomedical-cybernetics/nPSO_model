@@ -1,4 +1,4 @@
-function [x, coords, comm] = nPSO_model(N, m, T, gamma, distr, plot_flag)
+function [x, coords, comm, d] = nPSO_model(N, m, T, gamma, distr, plot_flag)
 
 % Implementation of the Popularity-Similarity-Optimization generative model
 % with nonuniform (nPSO) or uniform (PSO) distribution of angular coordinates.
@@ -51,6 +51,7 @@ function [x, coords, comm] = nPSO_model(N, m, T, gamma, distr, plot_flag)
 %        the component of the mixture distribution whose mean
 %        is at the lowest angular distance
 %        (the output is empty in the PSO model case)
+% d - matrix of pairwise hyperbolic distances between the nodes
 
 % NB: for the establishment of the new links in the network we adopt
 % the fast implementation referred in the paper as implementation #3.
@@ -165,6 +166,9 @@ end
 
 % create the adjacency matrix from the edge list
 x = sparse([x(:,1);x(:,2)],[x(:,2);x(:,1)],1,N,N);
+
+% matrix of pairwise hyperbolic distances between the nodes
+d = squareform(pdist(coords, @hyperbolic_dist));
 
 if plot_flag
     % plot mixture distribution
